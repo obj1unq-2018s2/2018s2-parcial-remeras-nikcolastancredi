@@ -1,0 +1,100 @@
+import remeras.*
+import comercio.*
+
+
+describe "Modelo Remeras"{
+	
+	const modeloNegra = new RemeraLisa(talle = 32, color= "Negro")
+	const modeloRoja = new RemeraLisa(talle = 45, color= "Roja")
+	const modeloGris = new RemeraLisa(talle =42, color = "Gris")
+	
+	const remeraBordeada = new RemeraBordada(
+		cantidadHilos = 4, talle = 44, color = "Blanco"
+	)
+	
+	const disney = new Empresa(derechoAutor = 100, tieneConvenio = false)
+	const frozen = new Dibujo (ancho = 10, alto=15, empresa = disney )
+	const sublimadaFrozen = new RemeraSublimadas(
+		talle = 42, 
+		color = "Gris",
+		dibujo = frozen		
+	)
+	
+	const flores = new Sucursal(
+		cantMinima = 10
+	)
+	const avellaneda = new Sucursal ( 
+		cantMinima = 3
+	)
+	
+	const pedido1 = new Pedido (
+		modeloRemera = modeloGris,
+		cantidad = 5,
+		sucursal = flores
+	)
+	
+	const pedido2 = new Pedido (
+		modeloRemera = modeloGris,
+		cantidad = 5,
+		sucursal = avellaneda
+	)
+	const pedido3 = new Pedido(
+		modeloRemera = sublimadaFrozen,
+		cantidad = 4,
+		sucursal = flores
+	)
+	
+	const pedido4 = new Pedido(
+		modeloRemera = sublimadaFrozen,
+		cantidad = 4,
+		sucursal = avellaneda
+	)
+	
+	const comercio = new Comercio(
+		sucursales = #{avellaneda,flores}
+		
+	)
+	//-------------------------------------------------
+	
+	test "Costo de Remeras Lisas"{
+		assert.equals(80,modeloNegra.costo())
+		assert.equals(110,modeloRoja.costo())
+		assert.equals(100,modeloGris.costo())
+	}
+	
+	test "Costo de Remeras Bordada"{
+		assert.equals(140,remeraBordeada.costo())
+	}
+	
+	test "Cost De Remera Sublimadas"{
+		assert.equals(75,sublimadaFrozen.costoSublimado())
+		assert.equals(275,sublimadaFrozen.costo())
+	}
+	
+	test "pedidos y sucursales"{
+		assert.equals(500,pedido1.precio())
+		assert.equals(450,pedido2.precio())
+		assert.equals(1100,pedido3.precio())
+		//assert.equals(880,pedido4.precio()) // Esta comentada por que ahora la empresa Disney  no tiene convenio.
+		assert.equals(990,pedido4.precio())
+	}
+
+	test "Parte C -   "{
+		comercio.registrarPedido(pedido1)
+		assert.that(comercio.pedidos().contains(pedido1))
+		// Punto 2
+		assert.equals(500,comercio.totalFacturado())
+		comercio.registrarPedido(pedido2)
+		assert.equals(950,comercio.totalFacturado())
+		assert.equals(500,comercio.totalFacturado(flores))
+		assert.equals(2,comercio.cantPedidosDe("Gris"))
+		assert.equals(pedido1,comercio.pedidoMasCaro())
+		
+		// punto 7 
+		assert.equals(flores,comercio.laSucursalQMasFacturo())
+		
+		
+	}
+	
+	
+}
